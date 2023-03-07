@@ -27,7 +27,6 @@ PKG_DRIVERS = \
 	lib80211 \
 	mac80211-hwsim \
 	mt7601u \
-	p54-common p54-pci p54-usb \
 	rsi91x rsi91x-usb rsi91x-sdio\
 	wlcore wl12xx wl18xx \
 	zd1211rw
@@ -266,38 +265,6 @@ define KernelPackage/mt7601u
   AUTOLOAD:=$(call AutoProbe,mt7601u)
 endef
 
-define KernelPackage/p54/Default
-  $(call KernelPackage/mac80211/Default)
-  TITLE:=Prism54 Drivers
-endef
-
-define KernelPackage/p54/description
-  Kernel module for Prism54 chipsets (mac80211)
-endef
-
-define KernelPackage/p54-common
-  $(call KernelPackage/p54/Default)
-  DEPENDS+= @(PCI_SUPPORT||USB_SUPPORT) +kmod-mac80211 +kmod-lib-crc-ccitt
-  TITLE+= (COMMON)
-  FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/intersil/p54/p54common.ko
-endef
-
-define KernelPackage/p54-pci
-  $(call KernelPackage/p54/Default)
-  TITLE+= (PCI)
-  DEPENDS+= @PCI_SUPPORT +kmod-p54-common +p54-pci-firmware
-  FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/intersil/p54/p54pci.ko
-  AUTOLOAD:=$(call AutoProbe,p54pci)
-endef
-
-define KernelPackage/p54-usb
-  $(call KernelPackage/p54/Default)
-  TITLE+= (USB)
-  DEPENDS+= @USB_SUPPORT +kmod-usb-core +kmod-p54-common +p54-usb-firmware
-  FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/intersil/p54/p54usb.ko
-  AUTOLOAD:=$(call AutoProbe,p54usb)
-endef
-
 define KernelPackage/rsi91x
   $(call KernelPackage/mac80211/Default)
   TITLE:=Redpine Signals Inc 91x WLAN driver support
@@ -396,10 +363,6 @@ config-$(call config_package,lib80211) += LIB80211 LIB80211_CRYPT_WEP LIB80211_C
 config-$(call config_package,mac80211-hwsim) += MAC80211_HWSIM
 config-$(call config_package,mt7601u) += MT7601U
 config-y += WL_MEDIATEK
-
-config-$(call config_package,p54-common) += P54_COMMON
-config-$(call config_package,p54-pci) += P54_PCI
-config-$(call config_package,p54-usb) += P54_USB
 
 config-$(call config_package,hermes) += HERMES
 config-$(call config_package,hermes-pci) += PCI_HERMES
